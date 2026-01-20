@@ -4,7 +4,7 @@ const router = express.Router();
 const bookController = require('../controllers/bookController');
 const { verifyToken, isAdmin } = require('../middleware/authMiddleware');
 
-console.log('bookController:', bookController); // debug
+// console.log('bookController:', bookController); // debug
 
 /**
  * PUBLIC

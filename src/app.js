@@ -6,7 +6,7 @@ const app = express();
 
 app.use(express.json());
 
-console.log('APP.JS LOADED');//
+// console.log('APP.JS LOADED');
 
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes')); 

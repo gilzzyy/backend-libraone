@@ -6,7 +6,7 @@ const {
   isAdmin
 } = require('../middleware/authMiddleware');
 
-console.log('✅ adminRoutes LOADED');//
+// console.log('✅ adminRoutes LOADED');
 
 router.get('/dashboard', verifyToken, isAdmin, (req, res) => {
   res.json({
