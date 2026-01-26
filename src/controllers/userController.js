@@ -48,25 +48,28 @@ exports.getProfile = async (req, res) => {
 exports.updateAvatar = async (req, res) => {
   try {
     const userId = req.user.id;
+    const { poto } = req.body;
 
-    if (!req.file) {
-      return res.status(400).json({ message: 'File tidak ditemukan' });
+    if (!poto) {
+      return res.status(400).json({
+        message: 'URL foto wajib diisi'
+      });
     }
 
-    const avatarPath = `/uploads/poto/${req.file.filename}`;
-
     await db.query(
-      `UPDATE users SET poto = ? WHERE id = ?`,
-      [avatarPath, userId]
+      'UPDATE users SET poto = ? WHERE id = ?',
+      [poto, userId]
     );
 
     res.json({
       message: 'Foto profil berhasil diperbarui',
-      poto: avatarPath
+      poto
     });
 
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Gagal update foto profil' });
+    res.status(500).json({
+      message: 'Gagal update foto profil'
+    });
   }
 };
