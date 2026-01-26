@@ -31,7 +31,7 @@ exports.getUnreadCount = async (req, res) => {
 
     const [[result]] = await db.query(
       `SELECT COUNT(*) AS total FROM notifikasi
-       WHERE user_id = ? AND is_read = false`,
+       WHERE user_id = ? AND dibaca = false`,
       [userId]
     );
 
@@ -49,14 +49,24 @@ exports.markAsRead = async (req, res) => {
     const userId = req.user.id;
     const { id } = req.params;
 
-    await db.query(
-      `UPDATE notifikasi SET is_read = true
+    const [result] = await db.query(
+      `UPDATE notifikasi
+       SET dibaca = true
        WHERE id = ? AND user_id = ?`,
       [id, userId]
     );
 
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        message: 'Notifikasi tidak ditemukan'
+      });
+    }
+
     res.json({ message: 'Notifikasi dibaca' });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+

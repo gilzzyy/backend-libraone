@@ -15,6 +15,7 @@ app.use('/api/peminjaman', require('./routes/peminjamanRoutes'));
 app.use('/api/leaderboard', require('./routes/leaderboardRoutes'));
 app.use('/api/denda', require('./routes/dendaRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
+app.use('uploads', express.static('uploads'));
 app.use('/api/notifikasi', require('./routes/notifikasiRoutes'));
 
 
