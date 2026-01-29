@@ -1,9 +1,7 @@
 const db = require('../config/db');
 
 
-/* ===============================
-   PINJAM BUKU
-================================ */
+
 exports.pinjamBuku = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -13,7 +11,7 @@ exports.pinjamBuku = async (req, res) => {
       return res.status(400).json({ message: 'id_buku wajib diisi' });
     }
 
-    // 1. Cek buku
+
     const [buku] = await db.query(
       'SELECT id_buku FROM buku WHERE id_buku = ?',
       [id_buku]
@@ -22,7 +20,7 @@ exports.pinjamBuku = async (req, res) => {
       return res.status(404).json({ message: 'Buku tidak ditemukan' });
     }
 
-    // 2. Cek sedang dipinjam
+
     const [dipinjam] = await db.query(
       `SELECT id FROM peminjaman 
        WHERE id_buku = ? AND status = 'dipinjam'`,
@@ -32,7 +30,7 @@ exports.pinjamBuku = async (req, res) => {
       return res.status(409).json({ message: 'Buku sedang dipinjam' });
     }
 
-    // 3. Simpan peminjaman (jatuh tempo 7 hari)
+
     const [result] = await db.query(
        `INSERT INTO peminjaman 
         (user_id, id_buku, tanggal_pinjam, tanggal_jatuh_tempo, status)
@@ -40,7 +38,7 @@ exports.pinjamBuku = async (req, res) => {
       [userId, id_buku]
     );
 
-    // 4. Tambah poin pinjam (+10)
+
     await db.query(
       'UPDATE users SET poin = poin + 10 WHERE id = ?',
       [userId]
@@ -57,15 +55,13 @@ exports.pinjamBuku = async (req, res) => {
   }
 };
 
-/* ===============================
-   KEMBALIKAN BUKU
-================================ */
+
 exports.kembalikanBuku = async (req, res) => {
   try {
     const userId = req.user.id;
     const { id } = req.params;
 
-    // 1. Ambil data peminjaman
+
     const [data] = await db.query(
       `SELECT * FROM peminjaman 
        WHERE id = ? AND user_id = ?`,
@@ -88,7 +84,7 @@ exports.kembalikanBuku = async (req, res) => {
     let poin = 0;
     let denda = 0;
 
-    // 2. Cek telat atau tidak
+
     if (today <= jatuhTempo) {
       await db.query(
         'UPDATE users SET poin = poin + ? WHERE id = ?',
@@ -106,7 +102,7 @@ exports.kembalikanBuku = async (req, res) => {
       );
     }
 
-    // 3. Update peminjaman
+
     await db.query(
       `UPDATE peminjaman 
        SET status = 'dikembalikan',
@@ -127,9 +123,7 @@ exports.kembalikanBuku = async (req, res) => {
   }
 };
 
-/* ===============================
-   RIWAYAT PEMINJAMAN
-================================ */
+
 exports.getMyPeminjaman = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -157,33 +151,7 @@ exports.getMyPeminjaman = async (req, res) => {
   }
 };
 
-// exports.getPeminjamanSaya = async (req, res) => {
-//   try {
-//     const userId = req.user.id;
 
-//     const data = await Peminjaman.findAll({
-//       where: { user_id: userId },
-//       include: [
-//         {
-//           model: Buku,
-//           attributes: ['id', 'judul', 'penulis']
-//         }
-//       ],
-//       order: [['createdAt', 'DESC']]
-//     });
-
-//     res.status(200).json({
-//       success: true,
-//       total: data.length,
-//       data
-//     });
-//   } catch (err) {
-//     res.status(500).json({
-//       success: false,
-//       message: err.message
-//     });
-//   }
-// };
 
 exports.perpanjangPeminjaman = async (req, res) => {
   try {
@@ -210,7 +178,7 @@ exports.perpanjangPeminjaman = async (req, res) => {
       return res.status(400).json({ message: 'Peminjaman sudah pernah diperpanjang' });
     }
 
-    // Tambah 2 hari
+
     await db.query(
       `UPDATE peminjaman
        SET tanggal_jatuh_tempo = DATE_ADD(tanggal_jatuh_tempo, INTERVAL 2 DAY),

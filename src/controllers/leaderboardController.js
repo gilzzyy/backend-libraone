@@ -16,7 +16,7 @@ exports.getLeaderboard = async (req, res) => {
       LIMIT 10
     `);
 
-    // tambahkan ranking manual
+
     const leaderboard = rows.map((user, index) => ({
       rank: index + 1,
       name: user.name,

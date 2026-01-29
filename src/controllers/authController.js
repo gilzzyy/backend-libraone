@@ -2,23 +2,20 @@ const db = require('../config/db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-/**
- * REGISTER
- */
+
 exports.register = async (req, res) => {
   try {
     console.log('BODY REGISTER:', req.body);
 
     const { name, email, password } = req.body;
 
-    // 1. Validasi body
     if (!email || !password) {
       return res.status(400).json({
         message: 'Email dan password wajib diisi'
       });
     }
 
-    // 2. Cek email sudah ada
+
     const [existing] = await db.query(
       'SELECT id FROM users WHERE email = ?',
       [email]
@@ -30,10 +27,10 @@ exports.register = async (req, res) => {
       });
     }
 
-    // 3. Hash password
+
     const hashedPassword = bcrypt.hashSync(password, 10);
 
-    // 4. INSERT (ROLE DIKUNCI OLEH SERVER)
+
     await db.query(
       'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
       [name || null, email, hashedPassword, 'anggota']
@@ -52,21 +49,19 @@ exports.register = async (req, res) => {
   }
 };
 
-/**
- * LOGIN (REAL)
- */
+
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // 1. Validasi
+
     if (!email || !password) {
       return res.status(400).json({
         message: 'Email dan password wajib diisi'
       });
     }
 
-    // 2. Cari user
+ 
     const [rows] = await db.query(
       'SELECT id, name, email, password, role FROM users WHERE email = ?',
       [email]
@@ -80,7 +75,7 @@ exports.login = async (req, res) => {
 
     const user = rows[0];
 
-    // 3. Bandingkan password
+
     const isMatch = bcrypt.compareSync(password, user.password);
     if (!isMatch) {
       return res.status(401).json({
@@ -88,7 +83,7 @@ exports.login = async (req, res) => {
       });
     }
 
-    // 4. Generate JWT
+  
     const token = jwt.sign(
       {
         id: user.id,
@@ -98,7 +93,7 @@ exports.login = async (req, res) => {
       { expiresIn: '1d' }
     );
 
-    // 5. Response
+
     return res.json({
       message: 'Login berhasil',
       token,

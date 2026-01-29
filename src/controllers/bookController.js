@@ -1,11 +1,7 @@
 const db = require('../config/db');
 const { broadcastAdminNotif } = require('../utils/notifikasiAdmin');
 
-/**
- * =========================
- * GET ALL BOOKS
- * =========================
- */
+
 exports.getAllBooks = async (req, res) => {
   try {
     const [books] = await db.query('SELECT * FROM buku');
@@ -18,11 +14,7 @@ exports.getAllBooks = async (req, res) => {
   }
 };
 
-/**
- * =========================
- * CREATE BOOK (ADMIN)
- * =========================
- */
+
 exports.createBook = async (req, res) => {
   try {
     const {
@@ -76,11 +68,7 @@ exports.createBook = async (req, res) => {
   }
 };
 
-/**
- * =========================
- * UPDATE BOOK (ADMIN)
- * =========================
- */
+
 exports.updateBook = async (req, res) => {
   try {
     const { id_buku } = req.params;
@@ -138,11 +126,7 @@ exports.updateBook = async (req, res) => {
   }
 };
 
-/**
- * =========================
- * DELETE BOOK (ADMIN)
- * =========================
- */
+
 exports.deleteBook = async (req, res) => {
   try {
     const { id_buku } = req.params;
@@ -170,34 +154,7 @@ exports.deleteBook = async (req, res) => {
   }
 };
 
-// exports.getAllBooks = async (req, res) => {
-//   try {
-//     const { search, kategori } = req.query;
 
-//     let query = `
-//       SELECT id_buku, judul, penulis, kategori, cover
-//       FROM buku
-//       WHERE 1=1
-//     `;
-//     const params = [];
-
-//     if (search) {
-//       query += ` AND judul LIKE ?`;
-//       params.push(`%${search}%`);
-//     }
-
-//     if (kategori && kategori !== 'Semua') {
-//       query += ` AND kategori = ?`;
-//       params.push(kategori);
-//     }
-
-//     const [books] = await db.query(query, params);
-//     res.json(books);
-
-//   } catch (err) {
-//     res.status(500).json({ message: 'Gagal mengambil buku' });
-//   }
-// };
 
 exports.getPopularBooks = async (req, res) => {
   try {
@@ -286,7 +243,7 @@ exports.perpanjangPeminjaman = async (req, res) => {
       return res.status(400).json({ message: 'Peminjaman sudah pernah diperpanjang' });
     }
 
-    // Tambah 2 hari
+    
     await db.query(
       `UPDATE peminjaman
        SET tanggal_jatuh_tempo = DATE_ADD(tanggal_jatuh_tempo, INTERVAL 2 DAY),

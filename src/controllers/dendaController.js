@@ -28,26 +28,7 @@ exports.getMyDenda = async (req, res) => {
   }
 };
 
-// exports.getTotalDenda = async (req, res) => {
-//   try {
-//     const userId = req.user.id;
 
-//     const [[result]] = await db.query(
-//       `SELECT IFNULL(SUM(d.jumlah), 0) AS total_denda
-//        FROM denda d
-//        JOIN peminjaman p ON d.peminjaman_id = p.id
-//        WHERE p.user_id = ?
-//        AND d.status = 'belum_bayar'`,
-//       [userId]
-//     );
-
-//     res.json(result);
-
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: 'Internal server error' });
-//   }
-// };
 
 
 exports.getTotalDenda = async (req, res) => {

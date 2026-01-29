@@ -1,8 +1,6 @@
 const db = require('../config/db');
 
-/* ===============================
-   GET NOTIFIKASI USER
-================================ */
+
 exports.getMyNotif = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -22,9 +20,7 @@ exports.getMyNotif = async (req, res) => {
   }
 };
 
-/* ===============================
-   JUMLAH NOTIFIKASI BELUM DIBACA
-================================ */
+
 exports.getUnreadCount = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -41,9 +37,7 @@ exports.getUnreadCount = async (req, res) => {
   }
 };
 
-/* ===============================
-   MARK AS READ
-================================ */
+
 exports.markAsRead = async (req, res) => {
   try {
     const userId = req.user.id;
