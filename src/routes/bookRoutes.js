@@ -14,7 +14,7 @@ router.get('/:id', bookController.getBookDetail);
 
 // ADMIN ONLY
 
-router.post('/', verifyToken, isAdmin, bookController.createBook);
+router.post('/tambah_buku', verifyToken, isAdmin, bookController.createBook);
 router.put('/:id_buku', verifyToken, isAdmin, bookController.updateBook);
 router.delete('/:id_buku', verifyToken, isAdmin, bookController.deleteBook);
 
