@@ -52,7 +52,7 @@ exports.createBook = async (req, res) => {
       ]
     );
 
-     await broadcastAdminNotif(
+    await broadcastAdminNotif(
       `📚 Buku baru "${judul}" telah ditambahkan`
     );
 
@@ -201,8 +201,8 @@ exports.getBookDetail = async (req, res) => {
         COUNT(p2.id) AS total_dipinjam
       FROM buku b
       LEFT JOIN peminjaman p2 ON b.id_buku = p2.id_buku
-      WHERE b.id = ?
-      GROUP BY b.id`,
+      WHERE b.id_buku = ?
+      GROUP BY b.id_buku`,
       [id]
     );
 
@@ -243,7 +243,7 @@ exports.perpanjangPeminjaman = async (req, res) => {
       return res.status(400).json({ message: 'Peminjaman sudah pernah diperpanjang' });
     }
 
-    
+
     await db.query(
       `UPDATE peminjaman
        SET tanggal_jatuh_tempo = DATE_ADD(tanggal_jatuh_tempo, INTERVAL 2 DAY),
