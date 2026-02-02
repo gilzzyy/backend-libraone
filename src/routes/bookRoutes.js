@@ -3,6 +3,7 @@ const router = express.Router();
 
 const bookController = require('../controllers/bookController');
 const { verifyToken, isAdmin } = require('../middleware/authMiddleware');
+const { upload } = require('../config/cloudinary');
 
 
 // PUBLIC
