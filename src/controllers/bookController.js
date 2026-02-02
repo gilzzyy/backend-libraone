@@ -15,58 +15,58 @@ exports.getAllBooks = async (req, res) => {
 };
 
 
-exports.createBook = async (req, res) => {
-  try {
-    const {
-      id_buku,
-      cover,
-      kategori,
-      judul,
-      pengarang,
-      penerbit,
-      tahun_terbit,
-      jumlah_halaman,
-      buku_deskripsi
-    } = req.body;
+// exports.createBook = async (req, res) => {
+//   try {
+//     const {
+//       id_buku,
+//       cover,
+//       kategori,
+//       judul,
+//       pengarang,
+//       penerbit,
+//       tahun_terbit,
+//       jumlah_halaman,
+//       buku_deskripsi
+//     } = req.body;
 
-    if (!id_buku || !judul) {
-      return res.status(400).json({
-        message: 'id_buku dan judul wajib diisi'
-      });
-    }
+//     if (!id_buku || !judul) {
+//       return res.status(400).json({
+//         message: 'id_buku dan judul wajib diisi'
+//       });
+//     }
 
-    await db.query(
-      `INSERT INTO buku 
-      (id_buku, cover, kategori, judul, pengarang, penerbit, tahun_terbit, jumlah_halaman, buku_deskripsi)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        id_buku,
-        cover,
-        kategori,
-        judul,
-        pengarang,
-        penerbit,
-        tahun_terbit,
-        jumlah_halaman,
-        buku_deskripsi
-      ]
-    );
+//     await db.query(
+//       `INSERT INTO buku 
+//       (id_buku, cover, kategori, judul, pengarang, penerbit, tahun_terbit, jumlah_halaman, buku_deskripsi)
+//       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+//       [
+//         id_buku,
+//         cover,
+//         kategori,
+//         judul,
+//         pengarang,
+//         penerbit,
+//         tahun_terbit,
+//         jumlah_halaman,
+//         buku_deskripsi
+//       ]
+//     );
 
-    await broadcastAdminNotif(
-      `📚 Buku baru "${judul}" telah ditambahkan`
-    );
+//     await broadcastAdminNotif(
+//       `📚 Buku baru "${judul}" telah ditambahkan`
+//     );
 
-    res.status(201).json({
-      message: 'Buku berhasil ditambahkan'
-    });
+//     res.status(201).json({
+//       message: 'Buku berhasil ditambahkan'
+//     });
 
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      message: 'Internal server error'
-    });
-  }
-};
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({
+//       message: 'Internal server error'
+//     });
+//   }
+// };
 
 
 exports.updateBook = async (req, res) => {
@@ -260,3 +260,59 @@ exports.perpanjangPeminjaman = async (req, res) => {
   }
 };
 
+exports.createBook = async (req, res) => {
+  try {
+    const {
+      id_buku,
+      cover,
+      kategori,
+      judul,
+      pengarang,
+      penerbit,
+      tahun_terbit,
+      jumlah_halaman,
+      buku_deskripsi
+    } = req.body;
+
+    if (!id_buku || !judul) {
+      return res.status(400).json({
+        message: 'id_buku dan judul wajib diisi'
+      });
+    }
+
+    await db.query(
+      `INSERT INTO buku 
+      (id_buku, cover, kategori, judul, pengarang, penerbit, tahun_terbit, jumlah_halaman, buku_deskripsi)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        id_buku,
+        cover || null,
+        kategori || null,
+        judul,
+        pengarang || null,
+        penerbit || null,
+        tahun_terbit || null,
+        jumlah_halaman || null,
+        buku_deskripsi || null
+      ]
+    );
+
+    try {
+      await broadcastAdminNotif(
+        `📚 Buku baru "${judul}" telah ditambahkan`
+      );
+    } catch (e) {
+      console.warn('Notif gagal:', e.message);
+    }
+
+    res.status(201).json({
+      message: 'Buku berhasil ditambahkan'
+    });
+
+  } catch (error) {
+    console.error('CREATE BOOK ERROR:', error);
+    res.status(500).json({
+      message: error.message
+    });
+  }
+};
