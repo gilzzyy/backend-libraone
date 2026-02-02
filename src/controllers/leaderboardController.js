@@ -19,7 +19,7 @@ exports.getLeaderboard = async (req, res) => {
 
     const leaderboard = rows.map((user, index) => ({
       rank: index + 1,
-      name: user.name,
+      nama: user.name,
       email: user.email,
       poin: user.poin
     }));
@@ -60,7 +60,7 @@ exports.getMyRank = async (req, res) => {
     );
 
     res.json({
-      name: me.name,
+      nama: me.name,
       poin: me.poin,
       ranking: rank.ranking
     });
