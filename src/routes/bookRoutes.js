@@ -3,7 +3,6 @@ const router = express.Router();
 
 const bookController = require('../controllers/bookController');
 const { verifyToken, isAdmin } = require('../middleware/authMiddleware');
-const { upload } = require('../config/cloudinary');
 
 
 // PUBLIC
@@ -15,7 +14,7 @@ router.get('/:id', bookController.getBookDetail);
 
 // ADMIN ONLY
 
-router.post('/', verifyToken, isAdmin, upload.single('cover'), bookController.createBook);
+router.post('/', verifyToken, isAdmin, bookController.createBook);
 router.put('/:id_buku', verifyToken, isAdmin, bookController.updateBook);
 router.delete('/:id_buku', verifyToken, isAdmin, bookController.deleteBook);
 
