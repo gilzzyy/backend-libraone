@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const { upload } = require('../config/cloudinary');
 const { broadcastAdminNotif } = require('../utils/notifikasiAdmin');
 
 
@@ -259,3 +260,46 @@ exports.perpanjangPeminjaman = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+
+
+// Route tambah buku dengan cover
+router.post('/', authMiddleware, adminMiddleware, upload.single('cover'), async (req, res) => {
+  try {
+    const { id_buku, judul, pengarang, penerbit, tahun_terbit, kategori, buku_deskripsi, jumlah_halaman } = req.body;
+    
+    // Jika ada file upload, ambil URL dari Cloudinary
+    // Jika tidak ada file, gunakan default
+    let cover = 'default.jpg';
+    if (req.file) {
+      cover = req.file.path; // URL lengkap dari Cloudinary
+    }
+    
+    // Simpan ke database
+    const query = `
+      INSERT INTO buku (id_buku, judul, pengarang, penerbit, tahun_terbit, kategori, cover, buku_deskripsi, jumlah_halaman) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    
+    await db.query(query, [
+      id_buku, 
+      judul, 
+      pengarang, 
+      penerbit, 
+      tahun_terbit, 
+      kategori, 
+      cover,  // Simpan URL Cloudinary atau 'default.jpg'
+      buku_deskripsi, 
+      parseInt(jumlah_halaman)
+    ]);
+    
+    res.status(201).json({ 
+      message: 'Buku berhasil ditambahkan',
+      cover: cover
+    });
+    
+  } catch (error) {
+    console.error('Error tambah buku:', error);
+    res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+});
