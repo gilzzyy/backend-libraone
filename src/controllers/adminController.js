@@ -329,3 +329,46 @@ exports.getAllPaidDenda = async (req, res) => {
     res.status(500).json({ message: 'Gagal mengambil data denda yang dibayar' });
   }
 };
+
+exports.getAllDenda = async (req, res) => {
+  try {
+    const [data] = await db.query(
+      `SELECT 
+        d.id AS denda_id,
+        u.id AS user_id,
+        u.name AS nama_user,
+        u.email,
+        b.judul,
+        d.jumlah,
+        d.status,
+        p.tanggal_pinjam,
+        p.tanggal_jatuh_tempo,
+        p.tanggal_kembali,
+        DATEDIFF(p.tanggal_kembali, p.tanggal_jatuh_tempo) AS hari_terlambat
+      FROM denda d
+      JOIN peminjaman p ON d.peminjaman_id = p.id
+      JOIN users u ON p.user_id = u.id
+      JOIN buku b ON p.id_buku = b.id_buku
+      ORDER BY d.id DESC`
+    );
+
+    const totalBelumBayar = data
+      .filter(row => row.status !== 'dibayar')
+      .reduce((sum, row) => sum + Number(row.jumlah), 0);
+
+    const totalDibayar = data
+      .filter(row => row.status === 'dibayar')
+      .reduce((sum, row) => sum + Number(row.jumlah), 0);
+
+    res.json({
+      total_denda: data.length,
+      total_belum_bayar: totalBelumBayar,
+      total_sudah_bayar: totalDibayar,
+      data
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Gagal mengambil data semua denda' });
+  }
+};

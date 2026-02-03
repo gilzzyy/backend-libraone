@@ -18,6 +18,7 @@ router.get('/peminjaman/terlambat', verifyToken, isAdmin, adminController.getLat
 // router.get('/users/:userId/peminjaman', verifyToken, isAdmin, adminController.getUserBorrowingHistory);
 
 //denda
+router.get('/denda', verifyToken, isAdmin, adminController.getAllDenda);
 router.get('/denda/summary', verifyToken, isAdmin, adminController.getAllDendaSummary);
 router.get('/denda/dibayar', verifyToken, isAdmin, adminController.getAllPaidDenda);
 
