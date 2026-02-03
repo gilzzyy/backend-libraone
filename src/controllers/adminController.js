@@ -191,3 +191,72 @@ exports.getAllReturnedBorrowings = async (req, res) => {
 //     res.status(500).json({ message: 'Gagal mengambil riwayat peminjaman user' });
 //   }
 // };
+
+exports.getOnTimeReturns = async (req, res) => {
+  try {
+    const [data] = await db.query(
+      `SELECT 
+        p.id,
+        u.id AS user_id,
+        u.name AS nama_user,
+        u.email,
+        b.id_buku,
+        b.judul,
+        b.pengarang,
+        p.tanggal_pinjam,
+        p.tanggal_jatuh_tempo,
+        p.tanggal_kembali
+      FROM peminjaman p
+      JOIN users u ON p.user_id = u.id
+      JOIN buku b ON p.id_buku = b.id_buku
+      WHERE p.status = 'dikembalikan'
+        AND p.tanggal_kembali <= p.tanggal_jatuh_tempo
+      ORDER BY p.tanggal_kembali DESC`
+    );
+
+    res.json({
+      total: data.length,
+      data
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Gagal mengambil data pengembalian tepat waktu' });
+  }
+};
+
+exports.getLateReturns = async (req, res) => {
+  try {
+    const [data] = await db.query(
+      `SELECT 
+        p.id,
+        u.id AS user_id,
+        u.name AS nama_user,
+        u.email,
+        b.id_buku,
+        b.judul,
+        b.pengarang,
+        p.tanggal_pinjam,
+        p.tanggal_jatuh_tempo,
+        p.tanggal_kembali,
+        DATEDIFF(p.tanggal_kembali, p.tanggal_jatuh_tempo) AS hari_terlambat,
+        d.jumlah AS denda
+      FROM peminjaman p
+      JOIN users u ON p.user_id = u.id
+      JOIN buku b ON p.id_buku = b.id_buku
+      LEFT JOIN denda d ON p.id = d.peminjaman_id
+      WHERE p.status = 'dikembalikan'
+        AND p.tanggal_kembali > p.tanggal_jatuh_tempo
+      ORDER BY p.tanggal_kembali DESC`
+    );
+
+    res.json({
+      total: data.length,
+      data
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Gagal mengambil data pengembalian terlambat' });
+  }
+};

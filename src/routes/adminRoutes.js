@@ -12,6 +12,8 @@ router.delete('/users/:id', verifyToken, isAdmin, adminController.deleteUser);
 
 router.get('/peminjaman/aktif', verifyToken, isAdmin, adminController.getAllActiveBorrowings);
 router.get('/peminjaman/riwayat', verifyToken, isAdmin, adminController.getAllReturnedBorrowings);
+router.get('/peminjaman/tepat-waktu', verifyToken, isAdmin, adminController.getOnTimeReturns);
+router.get('/peminjaman/terlambat', verifyToken, isAdmin, adminController.getLateReturns);
 // router.get('/users/:userId/peminjaman', verifyToken, isAdmin, adminController.getUserBorrowingHistory);
 
 module.exports = router;
