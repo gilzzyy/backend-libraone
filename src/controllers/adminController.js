@@ -260,3 +260,72 @@ exports.getLateReturns = async (req, res) => {
     res.status(500).json({ message: 'Gagal mengambil data pengembalian terlambat' });
   }
 };
+
+exports.getAllDendaSummary = async (req, res) => {
+  try {
+    const [data] = await db.query(
+      `SELECT 
+        u.id AS user_id,
+        u.name AS nama_user,
+        u.email,
+        COUNT(d.id) AS jumlah_transaksi,
+        SUM(d.jumlah) AS total_dibayar
+      FROM users u
+      JOIN peminjaman p ON u.id = p.user_id
+      JOIN denda d ON p.id = d.peminjaman_id
+      WHERE d.status = 'dibayar'
+      GROUP BY u.id, u.name, u.email
+      ORDER BY total_dibayar DESC`
+    );
+
+    // Hitung grand total
+    const grandTotal = data.reduce((sum, row) => sum + Number(row.total_dibayar), 0);
+
+    res.json({
+      jumlah_user: data.length,
+      total_denda_dibayar: grandTotal,
+      data
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Gagal mengambil ringkasan denda' });
+  }
+};
+
+exports.getAllPaidDenda = async (req, res) => {
+  try {
+    const [data] = await db.query(
+      `SELECT 
+        d.id AS denda_id,
+        u.id AS user_id,
+        u.name AS nama_user,
+        u.email,
+        b.judul,
+        d.jumlah,
+        d.status,
+        p.tanggal_pinjam,
+        p.tanggal_jatuh_tempo,
+        p.tanggal_kembali,
+        DATEDIFF(p.tanggal_kembali, p.tanggal_jatuh_tempo) AS hari_terlambat
+      FROM denda d
+      JOIN peminjaman p ON d.peminjaman_id = p.id
+      JOIN users u ON p.user_id = u.id
+      JOIN buku b ON p.id_buku = b.id_buku
+      WHERE d.status = 'dibayar'
+      ORDER BY d.id DESC`
+    );
+
+    const totalDibayar = data.reduce((sum, row) => sum + Number(row.jumlah), 0);
+
+    res.json({
+      total_transaksi: data.length,
+      total_dibayar: totalDibayar,
+      data
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Gagal mengambil data denda yang dibayar' });
+  }
+};
